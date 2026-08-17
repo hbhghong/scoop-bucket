@@ -12,6 +12,7 @@
             "ScreenCapture"
         ]
     ],
+    "persist": "config.json",
     "checkver": "github",
     "autoupdate": {
         "url": "https://github.com/xland/ScreenCapture/releases/download/$version/ScreenCapture.exe"
