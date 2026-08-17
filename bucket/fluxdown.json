@@ -1,0 +1,79 @@
+{
+    "version": "0.4.7",
+    "description": "FluxDown - Rust 驱动的多协议下载管理器（便携版）| A modern multi-protocol download manager (Portable)",
+    "homepage": "https://github.com/zerx-lab/FluxDown",
+    "license": {
+        "identifier": "AGPL-3.0-only",
+        "url": "https://github.com/zerx-lab/FluxDown/blob/main/LICENSE"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/zerx-lab/FluxDown/releases/download/v0.4.7/FluxDown-0.4.7-windows-x64-portable.zip",
+            "hash": "2de8975135e3e7856ddd36787db3625cf88972f24e8404ac313e5162acafed53"
+        },
+        "arm64": {
+            "url": "https://github.com/zerx-lab/FluxDown/releases/download/v0.4.7/FluxDown-0.4.7-windows-arm64-portable.zip",
+            "hash": "b6967f757f1bb826de298c3fd193b895f43b55614fadcda818ace5fb0c60e823"
+        }
+    },
+    "pre_install": [
+        "# 创建 portable_data 持久化目录，应用 0.2.3+ 将运行数据统一存储于此子目录",
+        "if (!(Test-Path \"$dir\\portable_data\")) { New-Item -ItemType Directory \"$dir\\portable_data\" -Force | Out-Null }"
+    ],
+    "uninstaller": {
+        "script": [
+            "# 结束进程（终止后等待文件句柄释放，避免文件锁定导致卸载失败）",
+            "Stop-Process -Name flux_down -Force -ErrorAction SilentlyContinue",
+            "Start-Sleep -Milliseconds 1500",
+            "# 清理开始菜单快捷方式残留（校验目标路径指向本应用目录，避免误删同名非 Scoop 快捷方式）",
+            "$appDir = Split-Path $dir -Parent",
+            "$shell = New-Object -ComObject WScript.Shell",
+            "@(\"$env:APPDATA\", \"$env:ProgramData\") | ForEach-Object {",
+            "    $lnk = \"$_\\Microsoft\\Windows\\Start Menu\\Programs\\FluxDown.lnk\"",
+            "    if ((Test-Path $lnk) -and ($shell.CreateShortcut($lnk).TargetPath -like \"$appDir\\*\")) {",
+            "        Remove-Item $lnk -Force -ErrorAction SilentlyContinue",
+            "    }",
+            "}"
+        ]
+    },
+    "shortcuts": [
+        [
+            "flux_down.exe",
+            "FluxDown"
+        ]
+    ],
+    "persist": "portable_data",
+    "checkver": {
+        "github": "https://github.com/zerx-lab/FluxDown"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/zerx-lab/FluxDown/releases/download/v$version/FluxDown-$version-windows-x64-portable.zip"
+            },
+            "arm64": {
+                "url": "https://github.com/zerx-lab/FluxDown/releases/download/v$version/FluxDown-$version-windows-arm64-portable.zip"
+            }
+        },
+        "hash": {
+            "url": "$baseurl/SHA256SUMS.txt"
+        }
+    },
+    "notes": [
+        "FluxDown 便携版数据持久化说明:",
+        "  - 已内置 portable 标记，运行数据自动存储在 portable_data/ 子目录",
+        "  - 任务记录/配置等核心数据通过 portable_data/flux_down.db（SQLite）持久化",
+        "  - BT 会话状态（断点续传）通过 portable_data/bt_session/ 目录持久化",
+        "  - 界面设置（窗口位置、主题、语言）通过 portable_data/settings.json 持久化",
+        "  - 应用日志通过 portable_data/logs/ 目录持久化",
+        "  - 更新版本时以上数据均自动保留，下载记录不丢失",
+        "",
+        "浏览器扩展（需配合本应用使用）:",
+        "  Chrome: https://chromewebstore.google.com/detail/fluxdown/meleenglfggcmcajknpeeeiobnpfmahc",
+        "  Firefox: https://addons.mozilla.org/firefox/addon/fluxdown",
+        "  Edge: https://microsoftedge.microsoft.com/addons/detail/fluxdown/nglkkjbogjghekbhhcnccnpfedjbdhhd",
+        "",
+        "命令行客户端 fluxdown.exe（独立下载，不在本便携包中）:",
+        "  https://github.com/zerx-lab/FluxDown/releases/tag/cli-v$version"
+    ]
+}
