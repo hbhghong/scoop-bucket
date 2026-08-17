@@ -20,10 +20,5 @@
         "if (-not (Test-Path \"$dir\\config.json\")) {",
         "  New-Item -ItemType File -Path \"$dir\\config.json\" -Force | Out-Null",
         "}"
-    ],
-    "post_update": [
-        "if (-not (Test-Path \"$dir\\config.json\")) {",
-        "  New-Item -ItemType File -Path \"$dir\\config.json\" -Force | Out-Null",
-        "}"
     ]
 }
