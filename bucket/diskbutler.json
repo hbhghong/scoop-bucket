@@ -16,7 +16,7 @@
   "installer": {
     "script": [
       "# handle runtime cache",
-      "Import-Module $(Join-Path (Split-Path $PSScriptRoot -Parent) scripts/AppsUtils.psm1)",
+      "Import-Module $(Join-Path $bucketdir scripts/AppsUtils.psm1) -Force",
       "Mount-ExternalRuntimeData -Source \"$persist_dir\\appdata\" -Target \"$env:LOCALAPPDATA\\com.diskbutler.app\"",
       "Mount-ExternalRuntimeData -Source \"$persist_dir\\userdata\" -Target \"$env:APPDATA\\com.diskbutler.app\"",
       "Remove-Module -Name AppsUtils"
@@ -24,7 +24,7 @@
   },
   "uninstaller": {
     "script": [
-      "Import-Module $(Join-Path (Split-Path $PSScriptRoot -Parent) scripts/AppsUtils.psm1)",
+      "Import-Module $(Join-Path $bucketdir scripts/AppsUtils.psm1) -Force",
       "Dismount-ExternalRuntimeData -Target \"$env:LOCALAPPDATA\\com.diskbutler.app\"",
       "Dismount-ExternalRuntimeData -Target \"$env:APPDATA\\com.diskbutler.app\"",
       "Remove-Module -Name AppsUtils"
