@@ -1,0 +1,27 @@
+{
+    "version": "2.5.11",
+    "description": "A feature-rich screenshot program.",
+    "homepage": "https://github.com/xland/ScreenCapture",
+    "license": "LGPL-3.0-only",
+    "url": "https://github.com/xland/ScreenCapture/releases/download/2.5.11/ScreenCapture.exe",
+    "hash": "0eb4b92a684723cb2189355660905a1b8437fff55e4ecc4bb6bd50333b86993f",
+    "bin": "ScreenCapture.exe",
+    "shortcuts": [
+        [
+            "ScreenCapture.exe",
+            "ScreenCapture"
+        ]
+    ],
+    "persist": [
+      ["config.json", "config.json"]
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/xland/ScreenCapture/releases/download/$version/ScreenCapture.exe"
+    },
+    "post_install": [
+        "if (-not (Test-Path \"$dir\\config.json\")) {",
+        "  New-Item -ItemType File -Path \"$dir\\config.json\" -Force | Out-Null",
+        "}"
+    ]
+}
