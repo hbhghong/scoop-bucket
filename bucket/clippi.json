@@ -40,12 +40,10 @@
     "post_install": [
         "$localCfg = Join-Path $dir 'clippi.toml'",
         "$storeCfg = Join-Path $persist_dir 'clippi.toml'",
-
         "# 仓库不存在，直接创建空文件",
         "if (-not (Test-Path $storeCfg)) {",
         "    New-Item $storeCfg -ItemType File -Force | Out-Null",
         "}",
-
         "# 把仓库文件复制到当前程序目录",
         "Copy-Item $storeCfg $localCfg -Force"
     ]
