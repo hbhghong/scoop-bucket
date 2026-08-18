@@ -12,14 +12,28 @@
             "ScreenCapture"
         ]
     ],
-    "persist": "config.json",
     "checkver": "github",
     "autoupdate": {
         "url": "https://github.com/xland/ScreenCapture/releases/download/$version/ScreenCapture.exe"
     },
-    "post_install": [
-        "if (-not (Test-Path \"$dir\\config.json\")) {",
-        "  New-Item -ItemType File -Path \"$dir\\config.json\" -Force | Out-Null",
+    "pre_uninstall": [
+        "$localCfg = Join-Path $dir 'config.json'",
+        "$storeCfg = Join-Path $persist_dir 'config.json'",
+        "# 卸载旧版前，如果本地存在配置，备份到持久目录",
+        "if (Test-Path $localCfg) {",
+        "    Copy-Item $localCfg $storeCfg -Force",
         "}"
+      ],
+    "post_install": [
+        "$localCfg = Join-Path $dir 'config.json'",
+        "$storeCfg = Join-Path $persist_dir 'config.json'",
+
+        "# 仓库不存在，直接创建空文件",
+        "if (-not (Test-Path $storeCfg)) {",
+        "    New-Item $storeCfg -ItemType File -Force | Out-Null",
+        "}",
+
+        "# 把仓库文件复制到当前程序目录",
+        "Copy-Item $storeCfg $localCfg -Force"
     ]
 }
