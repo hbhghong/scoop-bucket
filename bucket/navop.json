@@ -12,6 +12,9 @@
             "Navop"
         ]
     ],
+    "persist":[
+        "data"
+    ],
     "checkver": {
         "github": "https://github.com/feigeCode/navop",
         "regex": "v([\\d.]+)"
