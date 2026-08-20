@@ -1,0 +1,31 @@
+{
+    "version": "1.12.26.6",
+    "description": "Blazing‑fast lightweight image viewer, support HEIC/PSD/SVG/GPS‑EXIF",
+    "homepage": "https://www.phoxo.com/",
+    "license": "Freeware",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/atphoxo/PhoXo/releases/download/see_1.12/phoxosee_1.12.26.6.7z",
+            "hash": "c2570d829220bb144b5574b359b297649bd5260dd883451a72f2aa72b426be05"
+        }
+    },
+    "extract_dir": "PhoXoSee",
+    "bin": "PhoXoSee.exe",
+    "shortcuts": [
+        [
+            "PhoXoSee.exe",
+            "PhoXoSee"
+        ]
+    ],
+    "checkver": {
+        "github": "https://github.com/atphoxo/PhoXo",
+        "regex": "see_([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/atphoxo/PhoXo/releases/download/see_$matchVersion/phoxosee_$version.7z"
+            }
+        }
+    }
+}
