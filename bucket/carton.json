@@ -1,0 +1,46 @@
+{
+    "version": "0.5.2",
+    "description": "A Windows and Linux GUI client for sing-box.",
+    "homepage": "https://github.com/821869798/carton",
+    "license": "GPL-3.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/821869798/carton/releases/download/v0.5.2/carton-0.5.2-win-x64-portable.zip",
+            "hash": "2477db9a9757cdb39c1bd14e716d52ad48f27695a87e7351a9829ab3afff348c"
+        },
+        "arm64": {
+            "url": "https://github.com/821869798/carton/releases/download/v0.5.2/carton-0.5.2-win-arm64-portable.zip",
+            "hash": "efc1fdde1fcd74e4493145e170dfc09ac1130c946a5bb27b4ece7db4153a6b3f"
+        }
+    },
+    "shortcuts": [
+        [
+            "carton.exe",
+            "Carton"
+        ]
+    ],
+    "pre_install": [
+        "$portableFlag = \"$dir\\.carton_portable_data\"",
+        "if (!(Test-Path \"$portableFlag\")) {",
+        "    Add-Content -Path \"$portableFlag\" -Value \"true\" -NoNewline",
+        "}"
+    ],
+    "bin": "carton.exe",
+    "env_add_path": "bin",
+    "persist": [
+        ".carton_portable_data",
+        "data",
+        "bin"
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/821869798/carton/releases/download/v$version/carton-$version-win-x64-portable.zip"
+            },
+            "arm64": {
+                "url": "https://github.com/821869798/carton/releases/download/v$version/carton-$version-win-arm64-portable.zip"
+            }
+        }
+    }
+}
