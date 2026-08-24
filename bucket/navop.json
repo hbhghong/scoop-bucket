@@ -1,10 +1,10 @@
 {
-    "version": "0.10.8",
+    "version": "0.10.9",
     "description": "Unified multi-protocol DevOps & database client (SQL/Redis/SSH/RDP + AI chat)",
     "homepage": "https://github.com/feigeCode/navop",
     "license": "Apache-2.0",
-    "url": "https://github.com/feigeCode/navop/releases/download/v0.10.8/navop-x86_64-pc-windows-msvc-portable.zip",
-    "hash": "52283007d412602c25f5ecb243a74ce308e32e570768731297b30e8a6b968c32",
+    "url": "https://github.com/feigeCode/navop/releases/download/v0.10.9/navop-x86_64-pc-windows-msvc-portable.zip",
+    "hash": "2a64906514e15f81d3618d091fdf80b692e8f20d5e461158b1f9e18f2953f4b4",
     "bin": "navop.exe",
     "shortcuts": [
         [
@@ -12,9 +12,7 @@
             "Navop"
         ]
     ],
-    "persist":[
-        "data"
-    ],
+    "persist": "data",
     "checkver": {
         "github": "https://github.com/feigeCode/navop",
         "regex": "v([\\d.]+)"
