@@ -1,0 +1,100 @@
+{
+    "version": "1.5.3",
+    "description": "图吧工具箱 winUI3 版，现代化的 PC 硬件检测与系统维护工具集 | Modern toolkit for PC hardware detection and system maintenance",
+    "homepage": "https://tubawinui3.cn",
+    "license": {
+        "identifier": "GPL-3.0-or-later"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/luolangaga/tubatools/releases/download/v1.5.3/TubaWinUi3_Portable_1.5.3_x64.zip",
+            "hash": "e1378d440681231d235df06ed36fca5b6213aa94aab7bace190f8c304ce361dc"
+        },
+        "arm64": {
+            "url": "https://github.com/luolangaga/tubatools/releases/download/v1.5.3/TubaWinUi3_Portable_1.5.3_arm64.zip",
+            "hash": "a9167f9394a0d90b2a0440853cc2fa358438f704e3b87cccc5f2b1cd1210c7eb"
+        }
+    },
+    "extract_to": "app",
+    "pre_install": [
+        "# 关闭正在运行的旧版本进程，避免迁移时文件占用",
+        "Stop-Process -Name 'TubaWinUi3' -Force -ErrorAction SilentlyContinue",
+        "# 更新时 Scoop 会清空旧版本目录，而子工具(Everything/CrystalDiskInfo/AIDA64/Dism++ 等)把设置与用户协议状态写在 app\\src\\Tools 下；",
+        "# 先把上一版本目录中的配置文件(ini/cfg/dat/config，约 5MB)备份到 persist\\ToolsConfig，供 post_install 还原到新版本",
+        "$toolsRel = 'app\\src\\Tools'",
+        "$backup = \"$persist_dir\\ToolsConfig\"",
+        "$prev = Get-ChildItem (Split-Path $dir) -Directory | Where-Object { $_.FullName -ne $dir -and $_.Name -ne 'current' -and (Test-Path (Join-Path $_.FullName $toolsRel)) } | Sort-Object LastWriteTime -Descending | Select-Object -First 1",
+        "if ($prev) {",
+        "    $srcTools = Join-Path $prev.FullName $toolsRel",
+        "    $files = @(Get-ChildItem $srcTools -Recurse -File -Include @('*.ini','*.cfg','*.dat','*.config'))",
+        "    Write-Host \"Backing up $($files.Count) tool config file(s) from previous version ...\"",
+        "    foreach ($f in $files) {",
+        "        $target = Join-Path $backup $f.FullName.Substring($srcTools.Length + 1)",
+        "        $tDir = Split-Path $target -Parent",
+        "        if (!(Test-Path $tDir)) { New-Item -ItemType Directory -Force $tDir | Out-Null }",
+        "        Copy-Item $f.FullName $target -Force",
+        "    }",
+        "}"
+    ],
+    "post_install": [
+        "# 关闭可能正在运行的旧版本进程，避免迁移时文件占用",
+        "Stop-Process -Name 'TubaWinUi3' -Force -ErrorAction SilentlyContinue",
+        "# 还原上一版本备份的子工具配置(robocopy 只复制备份中存在的文件，不影响新版本自带文件)",
+        "$backup = \"$persist_dir\\ToolsConfig\"",
+        "if (Test-Path $backup) { robocopy $backup \"$dir\\app\\src\\Tools\" /S /NJH /NJS /NP /NFL /NDL | Out-Null; if ($LASTEXITCODE -ge 8) { Write-Host \"WARNING: tool config restore failed (robocopy $LASTEXITCODE)\" } }",
+        "# 数据目录 Junction 化：LocalAppData 路径 -> persist（首次/迁移时自动搬运已有数据）",
+        "$link = \"$env:LocalAppData\\TubaWinUi3\"",
+        "$dst = \"$persist_dir\\AppData\\Local\\TubaWinUi3\"",
+        "if (Test-Path $link) {",
+        "    $item = Get-Item $link -Force",
+        "    if ($item.LinkType -eq 'Junction') {",
+        "        $old = $item.Target",
+        "        if ($old -ne $dst) {",
+        "            robocopy $old $dst /E /MOVE /R:1 /W:1 /NP /NFL /NDL /NJH /NJS | Out-Null",
+        "            if ($LASTEXITCODE -ge 8) { Write-Host \"WARNING: migration failed (robocopy $LASTEXITCODE); keeping existing link.\" }",
+        "            else { (Get-Item $link -Force).Delete() }",
+        "        }",
+        "    } else {",
+        "        robocopy $link $dst /E /MOVE /R:1 /W:1 /NP /NFL /NDL /NJH /NJS | Out-Null",
+        "        if ($LASTEXITCODE -ge 8) { Write-Host \"WARNING: migration failed (robocopy $LASTEXITCODE); original data kept in place.\" }",
+        "    }",
+        "}",
+        "if (!(Test-Path $link)) { New-Item -ItemType Junction -Path $link -Target $dst | Out-Null }",
+        "elseif ((Get-Item $link -Force).LinkType -eq 'Junction') { Write-Host \"Already linked: $link\" }",
+        "else { Write-Host \"WARNING: $link exists as a real folder; junction skipped.\" }"
+    ],
+    "pre_uninstall": [
+        "Stop-Process -Name 'TubaWinUi3' -Force -ErrorAction SilentlyContinue",
+        "# 卸载前把当前版本的子工具配置备份到 persist，避免未经历过更新周期的配置丢失",
+        "$backup = \"$persist_dir\\ToolsConfig\"",
+        "$srcTools = Join-Path $dir 'app\\src\\Tools'",
+        "if (Test-Path $srcTools) { foreach ($f in (Get-ChildItem $srcTools -Recurse -File -Include @('*.ini','*.cfg','*.dat','*.config'))) { $target = Join-Path $backup $f.FullName.Substring($srcTools.Length + 1); $tDir = Split-Path $target -Parent; if (!(Test-Path $tDir)) { New-Item -ItemType Directory -Force $tDir | Out-Null }; Copy-Item $f.FullName $target -Force } }",
+        "if ((Test-Path \"$env:LocalAppData\\TubaWinUi3\") -and ((Get-Item \"$env:LocalAppData\\TubaWinUi3\" -Force).LinkType -eq 'Junction')) { (Get-Item \"$env:LocalAppData\\TubaWinUi3\" -Force).Delete() }"
+    ],
+    "bin": [
+        [
+            "app\\src\\TubaWinUi3.exe",
+            "tubatools"
+        ]
+    ],
+    "shortcuts": [
+        [
+            "app\\src\\TubaWinUi3.exe",
+            "图吧工具箱WinUi3"
+        ]
+    ],
+    "persist": "AppData\\Local\\TubaWinUi3",
+    "checkver": {
+        "github": "https://github.com/luolangaga/tubatools"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/luolangaga/tubatools/releases/download/v$version/TubaWinUi3_Portable_$version_x64.zip"
+            },
+            "arm64": {
+                "url": "https://github.com/luolangaga/tubatools/releases/download/v$version/TubaWinUi3_Portable_$version_arm64.zip"
+            }
+        }
+    }
+}
