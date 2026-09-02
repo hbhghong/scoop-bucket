@@ -30,6 +30,8 @@
         }
     },
     "pre_uninstall": [
+        "# 1. 关闭正在运行的 clippi.exe",
+        "Get-Process -Name 'clippi' -ErrorAction SilentlyContinue | Stop-Process -Force",
         "$localCfg = Join-Path $dir 'clippi.toml'",
         "$storeCfg = Join-Path $persist_dir 'clippi.toml'",
         "# 卸载旧版前，如果本地存在配置，备份到持久目录",
