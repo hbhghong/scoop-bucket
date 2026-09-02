@@ -17,6 +17,8 @@
         "url": "https://github.com/xland/ScreenCapture/releases/download/$version/ScreenCapture.exe"
     },
     "pre_uninstall": [
+        "# 1. 关闭正在运行的 ScreenCapture.exe",
+        "Get-Process -Name 'ScreenCapture' -ErrorAction SilentlyContinue | Stop-Process -Force",
         "$localCfg = Join-Path $dir 'config.json'",
         "$storeCfg = Join-Path $persist_dir 'config.json'",
         "# 卸载旧版前，如果本地存在配置，备份到持久目录",
