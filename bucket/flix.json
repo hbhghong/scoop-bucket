@@ -12,7 +12,7 @@
     "shortcuts": [
         [
             "flix.exe",
-            "..\\Flix"
+            "Flix"
         ]
     ],
     "post_install": [
