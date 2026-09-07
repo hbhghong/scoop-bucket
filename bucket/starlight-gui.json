@@ -35,7 +35,7 @@
     "shortcuts": [
         [
             "StarlightGUI.exe",
-            "Starlight GUI"
+            "..\\Starlight GUI"
         ]
     ],
     "persist": "StarlightGUI.json",
@@ -44,7 +44,8 @@
             "$releases = Invoke-RestMethod 'https://api.github.com/repos/OpenStarlight/StarlightGUI/releases'",
             "# 优先预发行版（prerelease=true），无预发行版时回退到最新正式版",
             "$pre = $releases | Where-Object { $_.prerelease } | Select-Object -First 1",
-            "$latest = if ($pre) { $pre } else { $releases | Select-Object -First 1 }",
+            // "$latest = if ($pre) { $pre } else { $releases | Select-Object -First 1 }",
+            "$latest = $releases | Select-Object -First 1",
             "$version = $latest.tag_name -replace '^v'",
             "# 取 .zip 资产，兼容预发行版 -Package.zip 与正式版 -Free.zip 两种命名",
             "$url = ($latest.assets | Where-Object { $_.name -like '*.zip' } | Select-Object -First 1).browser_download_url",
