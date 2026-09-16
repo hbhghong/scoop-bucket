@@ -1,0 +1,90 @@
+{
+    "version": "0.7.2",
+    "description": "Velotype - 基于 Rust + GPUI 的原生 Markdown 编辑器，支持所见即所得 (WYSIWYG) 与源码编辑双模式 | A native Rust Markdown editor with WYSIWYG and source editing modes",
+    "homepage": "https://github.com/manyougz/velotype",
+    "license": {
+        "identifier": "Apache-2.0",
+        "url": "https://github.com/manyougz/velotype/blob/main/LICENSE-APACHE"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/manyougz/velotype/releases/download/v0.7.2/velotype-v0.7.2-windows-x86_64.zip",
+            "hash": "ee20871eb8f6e517858ecfd56e0104091cc3bb96583748fe30aa0ffe11fc6960"
+        },
+        "arm64": {
+            "url": "https://github.com/manyougz/velotype/releases/download/v0.7.2/velotype-v0.7.2-windows-aarch64.zip",
+            "hash": "5e8d94a28f2d142feab28ea5bcf8e0aad64e778eca19189fedc584e952cd2cd3"
+        }
+    },
+    "pre_install": [
+        "ensure \"$persist_dir\\data\" | Out-Null",
+        "$junction = \"$env:APPDATA\\manyougz\\Velotype\"",
+        "if (Test-Path -LiteralPath $junction) {",
+        "    if ((Get-Item -LiteralPath $junction -Force -ErrorAction SilentlyContinue).Attributes -band [System.IO.FileAttributes]::ReparsePoint) {",
+        "        [System.IO.Directory]::Delete($junction)",
+        "    } else {",
+        "        # 真实目录 → 迁移已有数据到 persist 目录后替换为 junction",
+        "        Write-Host \"迁移 Velotype 配置数据到 persist 目录...\"",
+        "        Copy-Item -LiteralPath $junction\\* -Destination \"$persist_dir\\data\" -Recurse -Force",
+        "        Remove-Item -LiteralPath $junction -Force -Recurse",
+        "    }",
+        "}",
+        "New-Item -ItemType Junction -Path $junction -Target \"$persist_dir\\data\" | Out-Null"
+    ],
+    "post_install": [
+        "# 重建 junction（更新后 Scoop 清理旧版本但 persist 数据保留）",
+        "$junction = \"$env:APPDATA\\manyougz\\Velotype\"",
+        "if (!(Test-Path \"$persist_dir\\data\")) { New-Item -ItemType Directory -Force -Path \"$persist_dir\\data\" | Out-Null }",
+        "if (Test-Path $junction) {",
+        "    $item = Get-Item $junction -Force -ErrorAction SilentlyContinue",
+        "    if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {",
+        "        [System.IO.Directory]::Delete($junction)",
+        "    }",
+        "}",
+        "New-Item -ItemType Junction -Path $junction -Target \"$persist_dir\\data\" | Out-Null"
+    ],
+    "pre_uninstall": [
+        "# 安全删除目录联接（使用 .NET API，不穿透到目标目录）",
+        "$junction = \"$env:APPDATA\\manyougz\\Velotype\"",
+        "if ((Test-Path $junction) -and ((Get-Item $junction -Force -ErrorAction SilentlyContinue).Attributes -band [System.IO.FileAttributes]::ReparsePoint)) {",
+        "    [System.IO.Directory]::Delete($junction)",
+        "}"
+    ],
+    "uninstaller": {
+        "script": [
+            "# 结束进程（终止后等待文件句柄释放，避免文件锁定导致卸载失败）",
+            "Stop-Process -Name velotype -Force -ErrorAction SilentlyContinue",
+            "Start-Sleep -Milliseconds 1500",
+            "# 清理开始菜单快捷方式残留（校验目标路径指向本应用目录，避免误删同名非 Scoop 快捷方式）",
+            "$appDir = Split-Path $dir -Parent",
+            "$shell = New-Object -ComObject WScript.Shell",
+            "@(\"$env:APPDATA\", \"$env:ProgramData\") | ForEach-Object {",
+            "    $lnk = \"$_\\Microsoft\\Windows\\Start Menu\\Programs\\Velotype.lnk\"",
+            "    if ((Test-Path $lnk) -and ($shell.CreateShortcut($lnk).TargetPath -like \"$appDir\\*\")) {",
+            "        Remove-Item $lnk -Force -ErrorAction SilentlyContinue",
+            "    }",
+            "}"
+        ]
+    },
+    "bin": "velotype.exe",
+    "shortcuts": [
+        [
+            "velotype.exe",
+            "Velotype"
+        ]
+    ],
+    "persist": "data",
+    "checkver": {
+        "github": "https://github.com/manyougz/velotype"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/manyougz/velotype/releases/download/v$version/velotype-v$version-windows-x86_64.zip"
+            },
+            "arm64": {
+                "url": "https://github.com/manyougz/velotype/releases/download/v$version/velotype-v$version-windows-aarch64.zip"
+            }
+        }
+    }
+}
