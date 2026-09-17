@@ -86,7 +86,7 @@
     "shortcuts": [
         [
             "Weixin.exe",
-            "..\\微信"
+            "微信"
         ]
     ],
     "checkver": {
