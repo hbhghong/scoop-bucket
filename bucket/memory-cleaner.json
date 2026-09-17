@@ -15,7 +15,7 @@
     "shortcuts": [
         [
             "MemoryCleaner.exe",
-            "Memory Cleanr"
+            "Memory Cleaner"
         ]
     ],
     "post_install": [
