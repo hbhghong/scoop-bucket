@@ -1,6 +1,6 @@
 {
     "version": "1.1.1",
-    "description": "A Windows memory cleaner with real-time monitoring, configurable cleanup areas, tray support, and global hotkeys",
+    "description": "A Windows memory cleaner with real-time monitoring, configurable cleanup areas, tray support, and global hotkeys。",
     "homepage": "https://github.com/Y-ASLant/MemoryCleaner",
     "license": "MIT",
     "notes": [
