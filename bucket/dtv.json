@@ -1,0 +1,31 @@
+{
+  "version": "3.0.3",
+  "description": "基于 Tauri 2.0 的跨平台斗鱼、虎牙、抖音、bilibili直播桌面客户端",
+  "homepage": "https://github.com/chen-zeong/DTV",
+  "license": {
+    "identifier": "MIT license",
+    "url": "https://github.com/chen-zeong/DTV#MIT-1-ov-file"
+  },
+  "architecture": {
+    "64bit": {
+      "url": "https://github.com/chen-zeong/DTV/releases/download/v3.0.3/DTV_3.0.3_x64-setup.exe#/dl.7z",
+      "hash": "4041f8c757c9c10b681a06c5c12f759f45b9e825dff6b7a5a07c257641e29fd4"
+    }
+  },
+  "pre_install": "Remove-Item \"$dir\\`$*\", \"$dir\\uninst*\" -Force -Recurse",
+  "notes": "依赖 Microsoft HEVC Video Extensions。",
+  "shortcuts": [
+    [
+      "dtv.exe",
+      "DTV"
+    ]
+  ],
+  "checkver": "https://github.com/chen-zeong/DTV",
+  "autoupdate": {
+    "architecture": {
+      "64bit": {
+        "url": "https://github.com/chen-zeong/DTV/releases/download/v$version/DTV_$version_x64-setup.exe#/dl.7z"
+      }
+    }
+  }
+}
