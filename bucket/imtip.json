@@ -1,11 +1,10 @@
 {
-    "version": "8.9.0.0",
+    "version": "8.8",
     "description": "通用输入法状态（中/英、全/半角、标点、大写）跟踪提示",
     "homepage": "https://imtip.aardio.com/",
     "license": "MIT",
-    "url": "https://imtip.aardio.com/update/ImTip.7z",
+    "url": "https://imtip.aardio.com/update/ImTip8.8.7z",
     "hash": "2fabc2dbbfefc4d651ab730fe1885bed054a6be18787eb8a82533f3beda5653c",
-    "bin": "ImTip.exe",
     "shortcuts": [
         [
             "ImTip.exe",
@@ -13,10 +12,10 @@
         ]
     ],
     "checkver": {
-        "url": "https://github.com/aardio/ImTip/raw/main/default.aproj",
-        "regex": "ProductVersion=\"([\\d.]+)\""
+        "url": "http://imtip.aardio.com/update/",
+        "jsonpath": "$.version"
     },
     "autoupdate": {
-        "url": "https://imtip.aardio.com/update/ImTip.7z"
+        "url": "https://imtip.aardio.com/update/ImTip$version.7z"
     }
 }
