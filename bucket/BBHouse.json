@@ -1,6 +1,6 @@
 {
     "version": "2.0.3",
-    "description": "哔哩哔哩第三方桌面客户端（Qt/C++ 原生实现），以动态流为首页，支持直播、港澳台番剧、弹幕播放、下载管理与本地历史缓存",
+    "description": "哔哩哔哩第三方桌面客户端（Qt/C++ 原生实现），以动态流为首页，支持直播、港澳台番剧、弹幕播放、下载管理与本地历史缓存。",
     "homepage": "https://github.com/endcloud/bbhouse-tauri-qt",
     "license": "GPL-3.0-only",
     "notes": [
