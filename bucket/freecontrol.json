@@ -19,7 +19,7 @@
     "installer": {
         "script": [
             "# handle runtime cache",
-            "Import-Module $(Join-Path $(Find-BucketDirectory -Root -Name apps) scripts/AppsUtils.psm1)",
+            "Import-Module $(Join-Path $(Find-BucketDirectory -Root -Name hd) scripts/AppsUtils.psm1)",
             "Mount-ExternalRuntimeData -Source \"$persist_dir\\appdata\" -Target \"$env:LOCALAPPDATA\\com.freecontrol\"",
             "Mount-ExternalRuntimeData -Source \"$persist_dir\\userdata\" -Target \"$env:APPDATA\\FreeControl2\"",
             "Remove-Module -Name AppsUtils"
@@ -27,7 +27,7 @@
     },
     "uninstaller": {
         "script": [
-            "Import-Module $(Join-Path $(Find-BucketDirectory -Root -Name apps) scripts/AppsUtils.psm1)",
+            "Import-Module $(Join-Path $(Find-BucketDirectory -Root -Name hd) scripts/AppsUtils.psm1)",
             "Dismount-ExternalRuntimeData -Target \"$env:LOCALAPPDATA\\com.freecontrol\"",
             "Dismount-ExternalRuntimeData -Target \"$env:APPDATA\\FreeControl2\"",
             "Remove-Module -Name AppsUtils"
