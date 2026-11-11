@@ -1,0 +1,53 @@
+{
+    "version": "0.1.20",
+    "description": "A lightweight Windows screenshot and annotation tool with long screenshots, screen recording, OCR, and pinning. | 轻量化的 Windows 截图与标注工具，支持长截图、录屏、OCR、贴图等功能",
+    "homepage": "https://github.com/CM-idea/SnowAir",
+    "license": "Apache-2.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/CM-idea/SnowAir/releases/download/v0.1.20-lite/SnowAir-Lite.exe#/SnowAir.exe",
+            "hash": "527ff64d8a379fa7c73c7e458b4ef3a68ba9c21475295eef855fdb35a14ba882"
+        }
+    },
+    "bin": "SnowAir.exe",
+    "shortcuts": [
+        [
+            "SnowAir.exe",
+            "SnowAir"
+        ]
+    ],
+    "post_uninstall": [
+        "if ($cmd -eq 'uninstall') { Remove-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run' -Name 'SnowAir' -ErrorAction SilentlyContinue }",
+        "if ($cmd -eq 'uninstall') { Remove-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run' -Name 'SnowAir' -ErrorAction SilentlyContinue }",
+        "if ($cmd -eq 'uninstall') { Get-ScheduledTask 'SnowAir' -ErrorAction SilentlyContinue | Unregister-ScheduledTask -Confirm:$false }"
+    ],
+    "pre_uninstall": [
+        "# 1. 关闭正在运行的 clippi.exe",
+        "Get-Process -Name 'clippi' -ErrorAction SilentlyContinue | Stop-Process -Force",
+        "$localCfg = Join-Path $dir 'config.json'",
+        "$storeCfg = Join-Path $persist_dir 'config.json'",
+        "# 卸载旧版前，如果本地存在配置，备份到持久目录",
+        "if (Test-Path $localCfg) {",
+        "    Copy-Item $localCfg $storeCfg -Force",
+        "}"
+    ],
+    "post_install": [
+        "$localCfg = Join-Path $dir 'config.json'",
+        "$storeCfg = Join-Path $persist_dir 'config.json'",
+        "if (Test-Path $storeCfg) {",
+        "# 把仓库文件复制到当前程序目录",
+        "Copy-Item $storeCfg $localCfg -Force",
+        "}"
+    ],
+    "checkver": {
+        "url": "https://github.com/CM-idea/SnowAir/releases.atom",
+        "regex": "Repository/\\d+/v([\\d.]+)-lite<"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/CM-idea/SnowAir/releases/download/v$version-lite/SnowAir-Lite.exe#/SnowAir.exe"
+            }
+        }
+    }
+}
