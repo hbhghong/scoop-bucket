@@ -4,7 +4,7 @@
     "homepage": "https://github.com/lvzhenbo/115-plus-desktop",
     "license": "MIT",
     "notes": [
-        "115+ 是一个基于 Tauri 2 + Vue 3 的 115 网盘第三方开源桌面客户端 ",
+        "115+ 是一个基于 Tauri 2 + Vue 3 的 115 网盘第三方开源桌面客户端",
         "内部状态目录：%APPDATA%\\io.github.lvzhenbo.115-plus-desktop\\",
         "  - tauri-plugin-pinia\\setting.json：下载设置、更新代理、播放器与字幕偏好",
         "  - tauri-plugin-pinia\\user.json：accessToken、refreshToken、用户信息与最近目录",
