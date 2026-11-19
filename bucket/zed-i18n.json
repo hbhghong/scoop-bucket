@@ -1,0 +1,116 @@
+{
+    "version": "1.28.1-i18n.1",
+    "description": "Zed 编辑器汉化版 —— 基于 LI-NA/zed-i18n 的社区本地化构建，内置简繁中文/日语/韩语等 13 种界面语言 | Localized builds of the Zed code editor",
+    "homepage": "https://github.com/LI-NA/zed-i18n",
+    "license": {
+        "identifier": "GPL-3.0-only",
+        "url": "https://github.com/LI-NA/zed-i18n/blob/master/LICENSE"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/LI-NA/zed-i18n/releases/download/v1.28.1-i18n.1/Zed-i18n-windows-x86_64.zip",
+            "hash": "1aec4105bad2ee38e0c42362d8ccc79cb8511b8648a85325ee3b504b0afa6607"
+        },
+        "arm64": {
+            "url": "https://github.com/LI-NA/zed-i18n/releases/download/v1.28.1-i18n.1/Zed-i18n-windows-aarch64.zip",
+            "hash": "892558e9faa46ade1fbae912e25747c867f31f5ab40232225415af12f3808e5a"
+        }
+    },
+    "env_set": {
+        "ZED_UPDATE_EXPLANATION": "Run 'scoop update Zed-i18n' to update."
+    },
+    "post_install": [
+        "# 将系统数据目录映射到 persist（AppData + LocalAppData）",
+        "$pairs = @(",
+        "    @(\"$persist_dir\\appdata\", \"$env:APPDATA\\Zed\"),",
+        "    @(\"$persist_dir\\local\", \"$env:LOCALAPPDATA\\Zed\")",
+        ")",
+        "foreach ($pair in $pairs) {",
+        "    $persistDir, $targetDir = $pair",
+        "    # 确保 persist 目录存在（必须在迁移前创建，Move-Item 需要目标目录存在）",
+        "    New-Item -ItemType Directory $persistDir -Force | Out-Null",
+        "    if (Test-Path $targetDir) {",
+        "        $item = Get-Item $targetDir -Force -ErrorAction SilentlyContinue",
+        "        if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {",
+        "            [System.IO.Directory]::Delete($targetDir)",
+        "        } else {",
+        "            Get-ChildItem $targetDir | Move-Item -Destination $persistDir -Force",
+        "            Remove-Item $targetDir -Force -Recurse -ErrorAction SilentlyContinue",
+        "        }",
+        "    }",
+        "    New-Item -ItemType Junction -Path $targetDir -Target $persistDir | Out-Null",
+        "}",
+        "# 关闭内置自动更新（发布包不含官方更新源，统一由 scoop 管理）",
+        "$cfg = \"$env:APPDATA\\Zed\\global_settings.json\"",
+        "$cfgDir = Split-Path -Parent $cfg",
+        "if (!(Test-Path $cfgDir)) { New-Item -ItemType Directory -Path $cfgDir -Force | Out-Null }",
+        "if ((Test-Path $cfg) -and ((Get-Item $cfg).Length -gt 0)) { $j = Get-Content $cfg -Raw | ConvertFrom-Json } else { $j = [pscustomobject]@{} }",
+        "$j | Add-Member -MemberType NoteProperty -Name auto_update -Value $false -Force",
+        "[System.IO.File]::WriteAllText($cfg, ($j | ConvertTo-Json -Depth 10), (New-Object System.Text.UTF8Encoding $false))"
+    ],
+    "pre_uninstall": [
+        "# 安全删除目录联接（使用 .NET API，不穿透到目标目录）",
+        "@(\"$env:APPDATA\\Zed\", \"$env:LOCALAPPDATA\\Zed\") | ForEach-Object {",
+        "    if ((Test-Path $_) -and ((Get-Item $_ -Force -ErrorAction SilentlyContinue).Attributes -band [System.IO.FileAttributes]::ReparsePoint)) {",
+        "        [System.IO.Directory]::Delete($_)",
+        "    }",
+        "}"
+    ],
+    "uninstaller": {
+        "script": [
+            "# 结束进程（终止后等待文件句柄释放，避免文件锁定导致卸载失败）",
+            "Stop-Process -Name Zed, ZedG -Force -ErrorAction SilentlyContinue",
+            "Start-Sleep -Milliseconds 1500",
+            "# 清理开始菜单快捷方式残留（校验目标路径指向本应用目录，避免误删同名非 Scoop 快捷方式）",
+            "$appDir = Split-Path $dir -Parent",
+            "$shell = New-Object -ComObject WScript.Shell",
+            "@(\"$env:APPDATA\", \"$env:ProgramData\") | ForEach-Object {",
+            "    $lnk = \"$_\\Microsoft\\Windows\\Start Menu\\Programs\\Zed汉化版.lnk\"",
+            "    if ((Test-Path $lnk) -and ($shell.CreateShortcut($lnk).TargetPath -like \"$appDir\\*\")) {",
+            "        Remove-Item $lnk -Force -ErrorAction SilentlyContinue",
+            "    }",
+            "}"
+        ]
+    },
+    "bin": [
+        [
+            "bin\\zed.exe",
+            "zed-i18n"
+        ]
+    ],
+    "shortcuts": [
+        [
+            "Zed.exe",
+            "..\\Zed汉化版"
+        ]
+    ],
+    "notes": [
+        "Zed 汉化版（社区本地化构建）数据已持久化：",
+        "  - 设置/键映射/主题 → persist\\appdata（映射 %APPDATA%\\Zed）",
+        "  - 数据库/扩展索引/语言服务器 → persist\\local（映射 %LOCALAPPDATA%\\Zed）",
+        "更新或重装时数据不会丢失。",
+        "内置自动更新已关闭，升级请执行 scoop update Zed-i18n。"
+    ],
+    "checkver": {
+        "url": "https://github.com/LI-NA/zed-i18n/releases/latest",
+        "regex": "/releases/tag/v([\\d.]+-i18n\\.\\d+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/LI-NA/zed-i18n/releases/download/v$version/Zed-i18n-windows-x86_64.zip",
+                "hash": {
+                    "url": "$baseurl/SHA256SUMS.txt",
+                    "regex": "([a-f0-9]{64})\\s+Zed-i18n-windows-x86_64\\.zip"
+                }
+            },
+            "arm64": {
+                "url": "https://github.com/LI-NA/zed-i18n/releases/download/v$version/Zed-i18n-windows-aarch64.zip",
+                "hash": {
+                    "url": "$baseurl/SHA256SUMS.txt",
+                    "regex": "([a-f0-9]{64})\\s+Zed-i18n-windows-aarch64\\.zip"
+                }
+            }
+        }
+    }
+}
